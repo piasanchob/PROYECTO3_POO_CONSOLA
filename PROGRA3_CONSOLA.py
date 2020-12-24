@@ -488,7 +488,7 @@ def left_key(event):
 def right_key(event):
     control.see_key(4)
 
-action = Action(1)
+action = Action(2)
 
 
 control = Controlador()
