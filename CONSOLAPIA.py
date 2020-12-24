@@ -1,5 +1,5 @@
 import random 
-from space_invaders import * 
+#from space_invaders import * 
 import keyboard
 import msvcrt as m
 import win32api
@@ -7,6 +7,16 @@ import time
 import socket
 from tkinter import *
 from tkinter import messagebox
+import pygame
+
+pygame.init()
+pygame.mixer.pre_init(44100,16,2,4096)
+
+#size = (width, height)
+
+pygame.mixer.music.load("tet.mp3")
+pygame.mixer.music.set_volume(1)
+pygame.mixer.music.play(-1)
 
 class Consola():
     def __init__(self,matriz,gameOver):
@@ -259,19 +269,55 @@ class Consola():
             
                     
     def disparar(self):
+        indices = [0,1,2,3,4,5,6,7,8,9]
+        indices.sort(reverse = True)
+
+        #indices = [0,1,2,3,4,5,6,7,8,9]
+        alien = False
+        for l in self.matriz:
+                
+            if 4 in l:
+
+                alien = True
+        if alien == False:
+            self.gameOver = True
+            print("GAME OVER")
+            messagebox.showinfo(message =  "GAME OVER")
         for l in self.matriz:
             for x in l:
                 if x == 8:
-                    c = self.matriz.index(l)
-                    if self.matriz[c] == l:
-                        old = l.index(x)
-                        if self.matriz[c - 1][old] != 1:
-                            l[old] = 0
-                            l = self.matriz[c - 1]
-                            l[old] = x
-                            break
-                        print("Invalido")
+                    old = l.index(x)
+                    new = self.matriz.index(l) - 3
+                    if self.matriz[new][old] == 4:
+                        self.matriz[new][old] = 0
+                        gui.tablerogui(ventana,self.matriz)
                         break
+                    
+        for x in self.matriz:
+            print(x)
+        
+        for l in self.matriz:
+            for x in self.matriz[indices[0]]:
+                if x == 4:
+                    c = indices[0]
+                    aux = self.matriz[indices[0]]
+                    old = aux.index(x)
+                    if self.matriz[c + 1][old] == 8 or self.matriz[c + 1][old] == 6:
+                        print("GAME OVER")
+                        messagebox.showinfo(message =  "GAME OVER")
+                        self.gameOver = True
+                        break
+                    
+                    self.matriz[c + 1][old] = x
+                    self.matriz[c][old] = 0   
+                    break
+            indices.pop(0)  
+
+        #pacman.fantasmas()
+        for x in self.matriz:
+            print(x)
+        gui.tablerogui(ventana,self.matriz)
+
 
     
     def fantasmas(self):
@@ -289,6 +335,37 @@ class Consola():
             elif r == 4:
                 pacman.abajo_fantasma()
                 break
+    def adelante_space(self):
+        for l in self.matriz:
+            for x in l:
+                if x == 8:
+                    old = l.index(x)
+                    new = old + 1
+                    
+                    l[new] = x
+                    l[old] = 0
+                    break
+                
+        
+        for x in self.matriz:
+            print(x)
+        gui.tablerogui(ventana,self.matriz)
+
+    def atras_space(self):
+        for l in self.matriz:
+            for x in l:
+                if x == 8:
+                    old = l.index(x)
+                    new = old - 1
+                    
+                    l[new] = x
+                    l[old] = 0
+                    break
+                
+        
+        for x in self.matriz:
+            print(x)
+        gui.tablerogui(ventana,self.matriz)
 
 
 class Controlador():
@@ -334,7 +411,15 @@ class Pantalla():
                 if tablero[i][j] == 7:
                     fontcolor = "red"
                     bgcolor = "red"
-                
+                if tablero[i][j] == 8:
+                    fontcolor = "lime"
+                    bgcolor = "lime"
+                if tablero[i][j] == 4:
+                    fontcolor = "cyan"
+                    bgcolor = "cyan"
+                if tablero[i][j] == 6:
+                    fontcolor = "purple"
+                    bgcolor = "purple"
 
                 b = Button(tab, text=tablero[i][j], fg=fontcolor, bg = bgcolor, width=4, heigh=2, font="Arial")
                 b.grid(row=i, column=j)
@@ -345,24 +430,24 @@ pacman = Consola([
 [1,0,0,0,0,0,0,0,0,0,0,0,0,1],
 [1,0,0,0,1,1,0,1,1,0,0,0,0,1],
 [1,0,0,0,0,0,0,0,0,0,0,0,0,1],
-[1,2,0,0,0,0,7,0,0,1,1,0,0,1],
+[1,2,0,0,0,0,7,0,0,1,1,2,0,1],
 [1,0,0,0,0,0,0,0,0,0,2,0,0,1],
 [1,0,0,1,0,1,1,1,0,0,0,0,0,1],
-[1,2,0,1,0,0,0,0,0,0,0,0,0,1],
+[1,2,0,1,0,0,0,0,0,0,2,0,0,1],
 [1,0,0,1,0,2,0,0,1,1,1,0,1,1],
 [1,3,0,0,0,0,0,0,0,0,0,0,0,1]],False)
 
 spaceinvaders = Consola([
-[0,0,0,3,0,3,0,3,0,3,0,0,0,0],
-[0,0,0,0,3,0,3,0,0,0,0,0,0,0],
+[0,0,0,4,0,4,0,4,0,4,0,0,0,0],
+[0,0,0,0,4,0,4,0,0,0,0,0,0,0],
 [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
 [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
 [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
 [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
 [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
 [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-[0,0,0,0,0,0,5,0,0,0,0,0,0,0],
-[1,1,1,1,1,1,1,1,1,1,1,1,1,1]],False)
+[0,0,0,0,0,0,8,0,0,0,0,0,0,0],
+[6,6,6,6,6,6,6,6,6,6,6,6,6,6]],False)
 
 #for x in matriz:
     #print(x)
@@ -387,12 +472,10 @@ class Action():
 
         if self.juego == 2:
             if msg == "RIGHT":
-                pass
-                #spaceinvaders.adelante_space()
+                spaceinvaders.adelante_space()
             if msg == "LEFT":
-                pass
-                #spaceinvaders.atras_space()
-            if msg == "A":
+                spaceinvaders.atras_space()
+            if msg == "UP":
                 spaceinvaders.disparar()
             
 
@@ -406,7 +489,7 @@ def right_key(event):
     control.see_key(4)
 
 action = Action(1)
-num = 1
+
 
 control = Controlador()
 
@@ -415,7 +498,10 @@ ventana.geometry("2000x3000") #dimensiones
 
 
 
-ventana.config(bg="blue")  
+ventana.config(bg="gold")  
+L = Label(ventana,text = "ARCADE",fg = "blue",font = "Arial",bg = "gold")
+L.config(font = ("Courier",100))
+L.place(x = 800,y = 100)
 ventana.bind("<Up>", up_key)
 ventana.bind("<Down>", down_key)
 ventana.bind("<Left>", left_key)
